@@ -10,7 +10,7 @@ import UIKit
 import BDBOAuth1Manager
 
 class TwitterAPICaller: BDBOAuth1SessionManager {    
-    static let client = TwitterAPICaller(baseURL: URL(string: "https://api.twitter.com"), consumerKey: "5lUJuO5AUpPUCez4ewYDFrtgh", consumerSecret: "s5ynGqXzstUZwFPxVyMDkYh197qvHOcVM3kwv1o2TKhS1avCdS")
+    static let client = TwitterAPICaller(baseURL: URL(string: K.twitterEndpoint), consumerKey: K.consumerKey, consumerSecret: K.consumerSecret)
     var loginSuccess: (() -> ())?
     var loginFailure: ((Error) -> ())?
     
@@ -35,11 +35,13 @@ class TwitterAPICaller: BDBOAuth1SessionManager {
             self.loginFailure?(error)
         })
     }
+    
     func logout (){
         deauthorize()
     }
     
     func getDictionaryRequest(url: String, parameters: [String:Any], success: @escaping (NSDictionary) -> (), failure: @escaping (Error) -> ()){
+        
         TwitterAPICaller.client?.get(url, parameters: parameters, progress: nil, success: { (task: URLSessionDataTask, response: Any?) in
             success(response as! NSDictionary)
         }, failure: { (task: URLSessionDataTask?, error: Error) in
@@ -48,6 +50,7 @@ class TwitterAPICaller: BDBOAuth1SessionManager {
     }
     
     func getDictionariesRequest(url: String, parameters: [String:Any], success: @escaping ([NSDictionary]) -> (), failure: @escaping (Error) -> ()){
+        
         print(parameters)
         TwitterAPICaller.client?.get(url, parameters: parameters, progress: nil, success: { (task: URLSessionDataTask, response: Any?) in
             success(response as! [NSDictionary])
@@ -55,8 +58,9 @@ class TwitterAPICaller: BDBOAuth1SessionManager {
             failure(error)
         })
     }
-
+    
     func postRequest(url: String, parameters: [Any], success: @escaping () -> (), failure: @escaping (Error) -> ()){
+        
         TwitterAPICaller.client?.post(url, parameters: parameters, progress: nil, success: { (task: URLSessionDataTask, response: Any?) in
             success()
         }, failure: { (task: URLSessionDataTask?, error: Error) in
@@ -64,4 +68,65 @@ class TwitterAPICaller: BDBOAuth1SessionManager {
         })
     }
     
+    func postTweet(tweetString: String, success: @escaping () -> (), failure: @escaping (Error) -> ()) {
+        
+        let parameters = ["status": tweetString]
+        TwitterAPICaller.client?.post(K.postTweetEndpoint, parameters: parameters, progress: nil, success: { (task: URLSessionDataTask, response: Any?) in
+            success()
+        }, failure: { (task: URLSessionDataTask?, error: Error) in
+            failure(error)
+        })
+    }
+    
+    func favoriteTweet(tweetId: Int, success: @escaping () -> (), failure: @escaping (Error) -> ()) {
+
+        let parameters = ["id": tweetId]
+        TwitterAPICaller.client?.post(K.favoriteTweetEndpoint, parameters: parameters, progress: nil, success: { (task: URLSessionDataTask, response: Any?) in
+            success()
+        }, failure: { (task: URLSessionDataTask?, error: Error) in
+            failure(error)
+        })
+    }
+    
+    func unfavoriteTweet(tweetId: Int, success: @escaping () -> (), failure: @escaping (Error) -> ()) {
+        
+        let parameters = ["id": tweetId]
+        TwitterAPICaller.client?.post(K.unfavoriteTweetEndpoint, parameters: parameters, progress: nil, success: { (task: URLSessionDataTask, response: Any?) in
+            success()
+        }, failure: { (task: URLSessionDataTask?, error: Error) in
+            failure(error)
+        })
+    }
+    
+    
+    func retweet(tweetId: Int, success: @escaping () -> (), failure: @escaping (Error) -> ()) {
+        
+        let url = "\(K.retweetEndpoint)\(tweetId).json"
+        let parameters = ["id": tweetId]
+        TwitterAPICaller.client?.post(url, parameters: parameters, progress: nil, success: { (task: URLSessionDataTask, response: Any?) in
+            success()
+        }, failure: { (task: URLSessionDataTask?, error: Error) in
+            failure(error)
+        })
+    }
+    
+    func unretweet(tweetId: Int, success: @escaping () -> (), failure: @escaping (Error) -> ()) {
+        
+        let url = "\(K.unretweetEndpoint)\(tweetId).json"
+        let parameters = ["id": tweetId]
+        TwitterAPICaller.client?.post(url, parameters: parameters, progress: nil, success: { (task: URLSessionDataTask, response: Any?) in
+            success()
+        }, failure: { (task: URLSessionDataTask?, error: Error) in
+            failure(error)
+        })
+    }
+    
+    func getUserProfile(success: @escaping (NSDictionary) -> (), failure: @escaping (Error) -> ()){
+
+        TwitterAPICaller.client?.get(K.userProfileEndpoint, parameters: nil, progress: nil, success: { (task: URLSessionDataTask, response: Any?) in
+            success(response as! NSDictionary)
+        }, failure: { (task: URLSessionDataTask?, error: Error) in
+            failure(error)
+        })
+    }
 }

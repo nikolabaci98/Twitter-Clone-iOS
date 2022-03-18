@@ -9,25 +9,25 @@
 import UIKit
 
 class LoginViewController: UIViewController {
-
-    let tokenEndpoint = "https://api.twitter.com/oauth/request_token"
     
     override func viewDidLoad() {
         super.viewDidLoad()
     }
 
     override func viewDidAppear(_ animated: Bool) {
-        if UserDefaults.standard.bool(forKey: "userLoggedIn") == true{
-            performSegue(withIdentifier: "LoginToHome", sender: self)
+        if UserDefaults.standard.bool(forKey: K.userDefaultForLogin) == true{
+            performSegue(withIdentifier: K.loginToHomeSegue, sender: self)
         }
     }
     
     @IBAction func didTapLogin(_ sender: UIButton) {
-        TwitterAPICaller.client?.login(url: tokenEndpoint, success: {
-            UserDefaults.standard.set(true, forKey: "userLoggedIn")
-            self.performSegue(withIdentifier: "LoginToHome", sender: self)
+        
+        TwitterAPICaller.client?.login(url: K.userLoginTokenEndpoint, success: {
+            UserDefaults.standard.set(true, forKey: K.userDefaultForLogin)
+            self.performSegue(withIdentifier: K.loginToHomeSegue, sender: self)
         }, failure: { error in
             print(error)
         })
     }
+    
 }
